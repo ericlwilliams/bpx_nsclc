@@ -11,17 +11,19 @@ fp = strcat(analy_loc,'meta_data/');
 fig_loc = strcat(analy_loc,'slides/figures/latest/');
 
 screen_size=get(0,'ScreenSize');
-ss_four2three = [0 0 screen_size(3)/2 (screen_size(4)/2)*(4/3)];
 
-   
+ss_four2three = [0 0 screen_size(3)/2 (screen_size(4)/2)*(4/3)];
+%ss_four2three = [0 0 screen_size(3) (screen_size(4))*(4/3)];
+
+
 do_print = true;
 
- 
+
 
 %fn = {'BPx_DiVj_DVHs_fx-1_a2busc8p6.mat'};dose_calib='uscbed';a2b_str='8p6';
 
-fn = {'BPx_DiVj_DVHs_fx-1_a2bInf.mat'};dose_calib='phys';a2b_str='\infty';
-%fn = {'BPx_DiVj_DVHs_fx-1_a2b3.mat'};dose_calib='a2b3';a2b_str='3';
+%fn = {'BPx_DiVj_DVHs_fx-1_a2bInf.mat'};dose_calib='phys';a2b_str='\infty';
+fn = {'BPx_DiVj_DVHs_fx-1_a2b3.mat'};dose_calib='a2b3';a2b_str='3';
 
 if isequal(a2b_str,'\infty')
     dose_unit = 'Gy';
@@ -51,6 +53,12 @@ for m = 1:length(fn)
     
     
     CG = CGobj{m};
+    
+    
+    
+    
+    
+    
     % survival/complication time
     f2 = ~cellfun('isempty',{CG.mGrp.mDateComp}); % patients with no complication date
     f3 = ~cellfun('isempty',{CG.mGrp.mDateLastFollowup}); % patients with no last follow up date
@@ -107,7 +115,7 @@ for m = 1:length(fn)
     
     set(gca,'xminortick','on','yminortick','on');
     xlabel(['Months'],'fontsize',14);
-    ylabel(['Probability of BPx'],'fontsize',14);
+    ylabel(['Probability of Brachial Plexopathy'],'fontsize',14);
     title('Brachial Plexopathy Incidence','fontsize',14);
     
     %% Prescribed dose
@@ -135,7 +143,7 @@ for m = 1:length(fn)
         1-sa.mSurvivalCurve{2}(sa.mCensorStatistics{2}(:,1)),'r+');
     %         xticks = get(gca,'Xlim'); set(gca,'XTick',0:6:max(xticks));
     
-%     str_pval1 = {strcat('Log-Rank p-value = ',num2str(sa.mpValue,2))};
+    %     str_pval1 = {strcat('Log-Rank p-value = ',num2str(sa.mpValue,2))};
     text(84,0.03,str_pval1,'FontSize',14);
     lgnd=legend(h_km,...
         ['Tx $\leq',num2str(med_tx),'$'],...
@@ -147,10 +155,10 @@ for m = 1:length(fn)
     
     set(gca,'xminortick','on','yminortick','on');
     xlabel(['Months'],'fontsize',14);
-    ylabel(['Probability of BPx'],'fontsize',14);
+    ylabel(['Probability of Brachial Plexopathy'],'fontsize',14);
     title('Brachial Plexopathy Incidence','fontsize',14);
     
-      %% Max BED Dose
+    %% Max BED Dose
     mx = max([CG.mGrp.mDoseBins_LQ]);
     med_mx = median(mx);
     flg_below=mx<=med_mx;
@@ -175,19 +183,19 @@ for m = 1:length(fn)
         1-sa.mSurvivalCurve{2}(sa.mCensorStatistics{2}(:,1)),'r+','MarkerSize',15);
     %         xticks = get(gca,'Xlim'); set(gca,'XTick',0:6:max(xticks));
     
-        % calc. hazard ratio from split
+    % calc. hazard ratio from split
     cox_beta=coxphfit(~flg_below',compdate,'baseline',0,'censoring',flgcensor);
     cur_lr_hrs = exp(cox_beta);
     if cur_lr_hrs>100
-    str_hr = ['HR~$> 10$'];
-    else        
-    str_hr = ['HR~$= ',num2str(cur_lr_hrs,3),'$'];
+        str_hr = ['HR~$> 10$'];
+    else
+        str_hr = ['HR~$= ',num2str(cur_lr_hrs,3),'$'];
     end
     ylim([0 0.2]);
-%    set(gca,'FontSize',16);
+    %    set(gca,'FontSize',16);
     str_pval1 = {strcat('$p$-value~$= ',num2str(sa.mpValue,'%1.2g'),'$')};
     %text(75,0.03,[str_pval1,str_hr],'FontSize',18);
-    text(0.75,0.8,[str_pval1,str_hr],...
+    text(0.05,0.8,[str_pval1,str_hr],...
         'FontSize',20,...
         'units','normalized',...
         'interpreter','latex');
@@ -195,7 +203,7 @@ for m = 1:length(fn)
     lgnd=legend(h_km,...
         ['D$_{\rm{max}} \leq',num2str(med_mx,3),'$~',dose_unit],...
         ['D$_{\rm{max}} >',num2str(med_mx,3),'$~',dose_unit],...
-        'Location','NorthEast');
+        'Location','NorthWest');
     set(lgnd,'FontSize',20);
     h=legend;
     set(h,'interpreter','latex');
@@ -203,15 +211,15 @@ for m = 1:length(fn)
     
     set(gca,'xminortick','on','yminortick','on');
     xlabel(['Years'],'fontsize',24,'interpreter','latex');
-    ylabel(['Probability of BPx'],'fontsize',24,'interpreter','latex');
+    ylabel(['Probability of Brachial Plexopathy'],'fontsize',24,'interpreter','latex');
     set(gca,'FontSize',18)
     %title('Brachial Plexopathy Incidence','fontsize',20);
- if do_print,
-    set(gcf,'Color','w');
-    export_fig(gcf,[fig_loc,'bpx_km_',dose_calib,'_dmax'],'-pdf');
-   disp(['Saving ',fig_loc,'bpx_km_',dose_calib,'_dmax.pdf']);
- end
-%         %% BED D05
+    if do_print,
+        set(gcf,'Color','w');
+        export_fig(gcf,[fig_loc,'bpx_km_',dose_calib,'_dmax'],'-pdf');
+        disp(['Saving ',fig_loc,'bpx_km_',dose_calib,'_dmax.pdf']);
+    end
+    %         %% BED D05
     doses = [CG.mGrp.mDoseBins_LQ];
     vols = [CG.mGrp.mVolCum];
     d05s = zeros(size(vols,2),1);
@@ -225,7 +233,7 @@ for m = 1:length(fn)
         d05s(j) = d05;
     end
     
-      
+    
     med_d05s = median(d05s);
     flg_below=d05s<=med_d05s;
     
@@ -248,7 +256,7 @@ for m = 1:length(fn)
     plot(sa.mSurvivalTimeSorted{2}(sa.mCensorStatistics{2}(:,1))./12,...
         1-sa.mSurvivalCurve{2}(sa.mCensorStatistics{2}(:,1)),'r+','MarkerSize',15);
     %         xticks = get(gca,'Xlim'); set(gca,'XTick',0:6:max(xticks));
-
+    
     % calc. hazard ratio from split
     cox_beta=coxphfit(~flg_below,compdate,'baseline',0,'censoring',flgcensor);
     cur_lr_hrs = exp(cox_beta);
@@ -258,32 +266,32 @@ for m = 1:length(fn)
     ylim([0 0.2]);
     xlim([0 10]);
     set(gca,'FontSize',18);
-
+    
     str_pval1 = {strcat('$p$-value~$= ',num2str(sa.mpValue,'%3.2g'),'$')};
     %text(75,0.03,[str_pval1,str_hr],'FontSize',18);
-    text(0.7,0.80,[str_pval1,str_hr],...
+    text(0.05,0.80,[str_pval1,str_hr],...
         'FontSize',20,...
         'units','normalized',...
         'interpreter','latex');
     lgnd=legend(h_km,...
         ['D$_{05} \leq',num2str(med_d05s,3),'$~',dose_unit],...
         ['D$_{05} >',num2str(med_d05s,3),'$~',dose_unit],...
-        'Location','NorthEast');
+        'Location','NorthWest');
     set(lgnd,'FontSize',18);
     h=legend;
     set(h,'interpreter','latex');
     
     set(gca,'xminortick','on','yminortick','on');
     xlabel(['Years'],'fontsize',24,'interpreter','latex');
-    ylabel(['Probability of BPx'],'fontsize',24,'interpreter','latex');
-
+    ylabel(['Probability of Brachial Plexopathy'],'fontsize',24,'interpreter','latex');
+    
     %title('Brachial Plexopathy Incidence','fontsize',20);
     
-   if do_print,
-    set(gcf,'Color','w');
-    export_fig(gcf,[fig_loc,'bpx_km_',dose_calib,'_d05'],'-pdf');
-   disp(['Saving ',fig_loc,'bpx_km_',dose_calib,'_d05.pdf']);
- end
+    if do_print,
+        set(gcf,'Color','w');
+        export_fig(gcf,[fig_loc,'bpx_km_',dose_calib,'_d05'],'-pdf');
+        disp(['Saving ',fig_loc,'bpx_km_',dose_calib,'_d05.pdf']);
+    end
     %% EUDs
     euds = [CG.mGrp.mEUD];
     lyman_n = CG.mLymanN;
@@ -338,66 +346,67 @@ for m = 1:length(fn)
         else
             str_hr = ['HR~$= ',num2str(lr_hrs(i),3),'$'];
         end
-%         str_log10a=['$\log_{10}(a) = ',num2str(log10a(i)),'$'];
-        text(0.7,0.80,[10,str_pval1,10,str_hr],...
+        %         str_log10a=['$\log_{10}(a) = ',num2str(log10a(i)),'$'];
+        text(0.05,0.80,[10,str_pval1,10,str_hr],...
             'units','normalized',...
             'interpreter','latex',...
             'FontSize',20);
         lgnd=legend(h_km,...
-           ['$gEUD(\log_{10}(a) = ',num2str(log10a(i)),') \leq ',num2str(med_eud,3),'$~',dose_unit],...
+            ['$gEUD(\log_{10}(a) = ',num2str(log10a(i)),') \leq ',num2str(med_eud,3),'$~',dose_unit],...
             ['$gEUD(\log_{10}(a) = ',num2str(log10a(i)),') > ',num2str(med_eud,3),'$~',dose_unit],...
-            'Location','NorthEast');
-      set(lgnd,'FontSize',20);
-      set(lgnd,'interpreter','latex');
- %       h=legend;
- %       set(h,'interpreter','latex');
-  
+            'Location','NorthWest');
+        set(lgnd,'FontSize',20);
+        set(lgnd,'interpreter','latex');
+        %       h=legend;
+        %       set(h,'interpreter','latex');
+        
         set(gca,'FontSize',20);
         set(gca,'xminortick','on','yminortick','on');
         xlabel(['Years'],'fontsize',24,'interpreter','latex');
-        ylabel(['Probability of BPx'],'fontsize',24,'interpreter','latex');
-%         title('Brachial Plexopathy Incidence','fontsize',22);
+        ylabel(['Probability of Brachial Plexopathy'],'fontsize',24,'interpreter','latex');
+        %         title('Brachial Plexopathy Incidence','fontsize',22);
         
-       if do_print,
-           %saveas(cur_fig,[fig_loc,'km_bpx_log10a-',num2str(i),'.eps']);
-           set(cur_fig,'Color','w');
-           export_fig(cur_fig,[fig_loc,'km_bpx_log10a_',dose_calib,'-',num2str(i)],...
-               '-png');
-           %print_fig(cur_fig,fig_loc,['km_bpx_log10a-',num2str(i)],'pdf');
-       end;
+        if do_print,
+            %saveas(cur_fig,[fig_loc,'km_bpx_log10a-',num2str(i),'.eps']);
+            set(gcf,'Color','w');
+            export_fig(gcf,[fig_loc,'km_bpx_log10a_',dose_calib,'-',num2str(i)],...
+                '-pdf');
+            %print_fig(cur_fig,fig_loc,['km_bpx_log10a-',num2str(i)],'pdf');
+        end;
     end
 end
 
-    cur_fig_ctr=cur_fig_ctr+1;
-   f=figure(cur_fig_ctr); clf reset;
-   
-    set(f,'Position',[0 0 screen_size(3)/2 screen_size(4)/2]);
-    
-    x_axis = log10a;
-    [ax,h1,h2]=plotyy(x_axis,lr_pvals,x_axis,lr_hrs,@semilogy);hold on;
-    set(h1,'LineWidth',2);
-    set(h2,'LineWidth',2);
-    set(ax(1),'YLim',[0.001 1]);
-    set(get(ax(1),'Ylabel'),'String','p-value','FontSize',20);    
+cur_fig_ctr=cur_fig_ctr+1;
+f=figure(cur_fig_ctr); clf reset;
 
-    set(ax(2),'YLim',[1 10]);
-    set(get(ax(2),'Ylabel'),'String','Hazard Ratio','FontSize',20);
-    semilogy(x_axis,repmat(0.05,length(x_axis)),'r--','LineWidth',1);
-    set(ax(1),'XLim',[min(log10a) max(log10a)]);
-    set(ax(2),'XLim',[min(log10a) max(log10a)]);
-    set(ax,'FontSize',15);
- 
-    hold off; % grid on;
-    xlabel('log_1_0(a)','fontsize',18);
-    %set(lgnd,'FontSize',14);
-    
- if do_print,
-           %saveas(cur_fig,[fig_loc,'km_bpx_log10a-',num2str(i),'.eps']);
-           set(f,'Color','w');
-           export_fig(cur_fig,[fig_loc,'bpx_logrank_pval_hr_',dose_calib],...
-               '-pdf');
-           %print_fig(cur_fig,fig_loc,['km_bpx_log10a-',num2str(i)],'pdf');
-       end;
+%set(f,'Position',[0 0 screen_size(3)/2 screen_size(4)/2]);
+set(f,'Position',ss_four2three);
+
+x_axis = log10a;
+[ax,h1,h2]=plotyy(x_axis,lr_pvals,x_axis,lr_hrs,@semilogy);hold on;
+set(h1,'LineWidth',2);
+set(h2,'LineWidth',2);
+set(ax(1),'YLim',[0.001 1]);
+set(get(ax(1),'Ylabel'),'String','$p$-value','FontSize',26,'interpreter','latex');
+
+set(ax(2),'YLim',[1 10]);
+set(get(ax(2),'Ylabel'),'String','Hazard Ratio','FontSize',26,'interpreter','latex');
+semilogy(x_axis,repmat(0.05,length(x_axis)),'r--','LineWidth',1);
+set(ax(1),'XLim',[min(log10a) max(log10a)]);
+set(ax(2),'XLim',[min(log10a) max(log10a)]);
+set(ax,'FontSize',16);
+
+hold off; % grid on;
+xlabel('$\log_{10}(a)$','fontsize',26,'interpreter','latex');
+%set(lgnd,'FontSize',14);
+
+if do_print,
+    %saveas(cur_fig,[fig_loc,'km_bpx_log10a-',num2str(i),'.eps']);
+    set(f,'Color','w');
+    export_fig(f,[fig_loc,'bpx_logrank_pval_hr_',dose_calib],...
+        '-pdf');
+    %print_fig(cur_fig,fig_loc,['km_bpx_log10a-',num2str(i)],'pdf');
+end;
 
 toc;
 end

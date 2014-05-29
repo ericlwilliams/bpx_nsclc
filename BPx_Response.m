@@ -17,8 +17,8 @@ ss_four2three = [0 0 screen_size(3)/2 (screen_size(4)/2)*(4/3)];
    
 do_print = true;
 
-fn = 'BPx_DiVj_DVHs_fx-1_a2bInf.mat';dose_calib='phys';a2b_str='\infty';
-%fn = 'BPx_DiVj_DVHs_fx-1_a2b3.mat';dose_calib='a2b3';a2b_str='3';
+%fn = 'BPx_DiVj_DVHs_fx-1_a2bInf.mat';dose_calib='phys';a2b_str='\infty';
+fn = 'BPx_DiVj_DVHs_fx-1_a2b3.mat';dose_calib='a2b3';a2b_str='3';
 
 if isequal(a2b_str,'\infty')
     dose_unit = 'Gy';
@@ -131,7 +131,7 @@ set(gca,'xminortick','on','yminortick','on');
 set(gca,'box','on');
 set(gca,'FontSize',20);
 xlabel(['D$_{\rm{max}}$~[',dose_unit,']'],'interpreter','latex','FontSize',24);
-ylabel('Probability of BPx','interpreter','latex','FontSize',24);
+ylabel('Probability of Brachial Plexopathy','interpreter','latex','FontSize',24);
 
 if do_print,
     set(cur_fig,'Color','w');
@@ -202,7 +202,7 @@ set(gca,'xminortick','on','yminortick','on');
 set(gca,'box','on');
 set(gca,'FontSize',20);
 xlabel(['D$_{5\%}$~[',dose_unit,']'],'interpreter','latex','FontSize',24);
-ylabel('Probability of BPx','interpreter','latex','FontSize',24);
+ylabel('Probability of Brachial Plexopathy','interpreter','latex','FontSize',24);
 
 if do_print,
     set(cur_fig,'Color','w');
