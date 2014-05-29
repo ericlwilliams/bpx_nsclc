@@ -1,14 +1,21 @@
 function BPxLogRankDisplay
 tic;
 % prepare
-fp = 'Z:\elw\MATLAB\bpx_analy\meta_data\';
+if ~isunix,
+    analy_loc = 'Z:/elw/MATLAB/bpx_analy/';
+else
+    analy_loc = '/Users/elw/Dropbox/eMacs/mskcc/analy/bpx_analy/';
+end
+
+fp = strcat(analy_loc,'meta_data/');
+fig_loc = strcat(analy_loc,'slides/figures/latest/');
 
 screen_size=get(0,'ScreenSize');
 ss_four2three = [0 0 screen_size(3)/2 (screen_size(4)/2)*(4/3)];
 
    
 do_print = true;
-fig_loc = 'Z:\elw\MATLAB\bpx_analy\slides\figures\latest\';
+
  
 
 %fn = {'BPx_DiVj_DVHs_fx-1_a2busc8p6.mat'};dose_calib='uscbed';a2b_str='8p6';
@@ -234,6 +241,7 @@ for m = 1:length(fn)
     % calc. hazard ratio from split
     cox_beta=coxphfit(~flg_below,compdate,'baseline',0,'censoring',flgcensor);
     cur_lr_hrs = exp(cox_beta);
+    
     str_hr = ['HR = ',num2str(cur_lr_hrs,3)];
     
     ylim([0 0.2]);
@@ -268,9 +276,12 @@ for m = 1:length(fn)
     
     lr_pvals = inf(size(log10a));
     lr_hrs = inf(size(log10a));
+    lr_hrs_ucl = inf(size(log10a));
+    lr_hrs_lcl = inf(size(log10a));
     
-    cur_fig=4;
+    cur_fig_ctr=4;
     for i=size(euds,1):-1:1
+        cur_fig_ctr = cur_fig_ctr+i;
         eud = euds(i,:);
         med_eud = median(eud);
         flg_below=eud<=med_eud;
@@ -288,12 +299,13 @@ for m = 1:length(fn)
         disp([num2str(log10a(i)),' p: ',num2str(lr_pvals(i)),' areas: ',...
             num2str(sa.mCurveArea(1)),', ',num2str(sa.mCurveArea(2))]);
         % calc. hazard ratio from split
-        cox_beta=coxphfit(~flg_below',compdate,'baseline',0,'censoring',flgcensor);
+        [cox_beta,~,~,cox_stats]=coxphfit(~flg_below',compdate,'baseline',0,'censoring',flgcensor);
         lr_hrs(i) = exp(cox_beta);
-        
+        lr_hrs_ucl(i) = lr_hrs(i) + 1.96*cox_stats.se;
+        lr_hrs_lcl(i) = lr_hrs(i) - 1.96*cox_stats.se;
         
         % plot
-        cur_fig=figure(cur_fig+i);  clf reset; hold on; % grid on;
+        cur_fig=figure(cur_fig_ctr);  clf reset; hold on; % grid on;
         set(gcf,'Position',ss_four2three);
         h_km(1)=stairs(sa.mSurvivalTimeSorted{1}./12,1-sa.mSurvivalCurve{1},'LineWidth',2);
         plot(sa.mSurvivalTimeSorted{1}(sa.mCensorStatistics{1}(:,1))./12,...
@@ -332,8 +344,10 @@ for m = 1:length(fn)
        end;
     end
 end
-    cur_fig = cur_fig+i;
-   f=figure(cur_fig+1); clf reset;
+
+    cur_fig_ctr=cur_fig_ctr+1;
+   f=figure(cur_fig_ctr); clf reset;
+   
     set(f,'Position',[0 0 screen_size(3)/2 screen_size(4)/2]);
     
     x_axis = log10a;
